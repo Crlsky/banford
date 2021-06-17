@@ -51,7 +51,7 @@ def numberOfLines(array):
 def percentOfNumber(number,nol):
     return round(number*100/nol)
 
-def banford(i):
+def benford(i):
     return round(math.log(1+(1/i),10)*100)
 
 def similarity(a,b):
@@ -59,28 +59,34 @@ def similarity(a,b):
         return 0
     return a/b
 
+def benfordDistrib(percent, benfordPercent, digit, tolerance):
+    if(percent < benfordPercent+tolerance and percent > benfordPercent-tolerance):
+        return 1
+    else:
+        return 0
+    
 def listFiles(path):
+    result = dict()
     files = os.listdir(path)
     for f in files:
+        sumBenford = 0
         iteration = 0
-        percentSummary = 0
-        print(f)
         arrayOfnumbers = countNumbersForBenford(f, path)
         nol = numberOfLines(arrayOfnumbers)
-        #print(arrayOfnumbers)
-
+        fileName = f.split(".")[0]
         for v in arrayOfnumbers:
             iteration += 1
-            if iteration == 0 or iteration > 9 :
+            if iteration > 9 :
                 continue
             percentNumber = percentOfNumber(arrayOfnumbers[iteration], nol)
-            percentBanford = banford(iteration)
-            sim = similarity(percentBanford, percentNumber)
-            percentSummary += sim
-            print(percentBanford, percentNumber, sim)
-        
-        print(percentSummary/9)
+            benfordPercent = benford(iteration)
+            sumBenford += benfordDistrib(percentNumber, benfordPercent, iteration, 4)
+            
+            #print(benfordPercent, percentNumber)
+        result[fileName]=round(sumBenford/9,2)
 
+    result = dict(sorted(result.items(), key=lambda item: item[1]))
+    print(result)
 
 
 listFiles('./data')
