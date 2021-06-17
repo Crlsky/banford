@@ -1,5 +1,6 @@
 import os
-import chardet    
+import chardet
+import math
 # first digit of int  int(str(file.readline())[:1])
 
 
@@ -12,18 +13,13 @@ def findFileCharset(filepath):
 
 def countNumbersForBenford(file, path):
     numbers = [0,0,0,0,0,0,0,0,0,0]
-    total = 0
     filepath = path + '/' + file
     with open(filepath, encoding=findFileCharset(filepath)) as f:
         while True:
             line = f.readline()
-            if not line:
+            if not line or line == '\n':
                 break
-
-            total += 1
             number = int(str(line)[:1])
-            
-
             if number == 0:
                 numbers[0] += 1
             if number == 1:
@@ -44,14 +40,47 @@ def countNumbersForBenford(file, path):
                 numbers[8] += 1
             if number == 9:
                 numbers[9] += 1
-        print(numbers)
-    
+    return numbers
+
+def numberOfLines(array):
+    total = 0
+    for x in array:
+        total += x
+    return total
+
+def percentOfNumber(number,nol):
+    return round(number*100/nol)
+
+def banford(i):
+    return round(math.log(1+(1/i),10)*100)
+
+def similarity(a,b):
+    if b == 0:
+        return 0
+    return a/b
 
 def listFiles(path):
     files = os.listdir(path)
     for f in files:
-        countNumbersForBenford(f, path)
+        iteration = 0
+        percentSummary = 0
         print(f)
+        arrayOfnumbers = countNumbersForBenford(f, path)
+        nol = numberOfLines(arrayOfnumbers)
+        #print(arrayOfnumbers)
+
+        for v in arrayOfnumbers:
+            iteration += 1
+            if iteration == 0 or iteration > 9 :
+                continue
+            percentNumber = percentOfNumber(arrayOfnumbers[iteration], nol)
+            percentBanford = banford(iteration)
+            sim = similarity(percentBanford, percentNumber)
+            percentSummary += sim
+            print(percentBanford, percentNumber, sim)
+        
+        print(percentSummary/9)
+
 
 
 listFiles('./data')
